@@ -32,7 +32,7 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 * Download and install Docker. See the installation instructions at the [Docker Web Site](https://docs.docker.com/engine/installation/ "Install Docker")
 * git clone this GitHub repo:
 ```
-git clone https://github.com/isc-krakshith/InterSystems-WebAPI.git
+git clone https://github.com/isc-krakshith/InterSystems-Broadsea.git
 ```
 * Update ./WebAPI/scripts/200_populate_source_source_daimon.sql with the details of the IRIS instance where the OMOP CDM is available, within the connection string 
 
