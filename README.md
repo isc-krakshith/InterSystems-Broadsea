@@ -25,6 +25,7 @@ This repository contains the Docker Compose file used to launch the OHDSI Broads
 
 If using Mac Silicon (M1, M2), set the DOCKER_ARCH variable in Section 1 of the .env file to "linux/arm64". Some Broadsea services still need to run via emulation of linux/amd64 and are hard-coded as such.
 However, if using webapi-local or webapi-from-image profiles set DOCKER_ARCH = "linux/amd64"
+AND, within Docker Desktop settings, under "Features in development", check the box: "Use Rosetta for x86/amd64 emulation on Apple Silicon"
 
 ## Broadsea - Quick start
 
