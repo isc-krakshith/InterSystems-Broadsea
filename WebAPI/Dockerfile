@@ -2,7 +2,7 @@ FROM maven:3.6-jdk-11 as builder
 
 WORKDIR /war
 
-COPY ./assets/WebAPI.war /war/
+RUN curl -LJO https://github.com/isc-krakshith/InterSystems-OHDSI-WebAPI/releases/latest/download/WebAPI.war
 RUN jar -xf WebAPI.war \
     && rm WebAPI.war
 
