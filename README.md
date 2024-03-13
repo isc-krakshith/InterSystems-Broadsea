@@ -29,25 +29,30 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 
 ## Broadsea - Quick start
 
-* Download and install Docker. See the installation instructions at the [Docker Web Site](https://docs.docker.com/engine/installation/ "Install Docker")
+* Download and install Docker. See the installation instructions at the [Docker Web Site](https://docs.docker.com/engine/installation/)
+  
 * git clone this GitHub repo:
-```
+```Shell
 git clone https://github.com/isc-krakshith/InterSystems-Broadsea.git
 ```
-* Update ./WebAPI/scripts/200_populate_source_source_daimon.sql with the details of the IRIS instance where the OMOP CDM is available, within the connection string 
+* Update `./WebAPI/scripts/200_populate_source_source_daimon.sql` with the details of the IRIS instance where the [OMOP CDM](https://github.com/OHDSI/CommonDataModel) is deployed, within the connection string. Please note that `host.docker.internal` is a reserved hostname that will resolve to the host where Docker is running, exposing its publicly available ports. This Broadsea setup assumes that server is already up and running.
 
-* In a command line / terminal window - navigate to the directory where this README.md file is located and start the Broadsea Docker Containers using the below command. On Linux you may need to use 'sudo' to run this command. Wait up to one minute for the Docker containers to start. The docker compose pull command ensures that the latest released versions of the OHDSI ATLAS and OHDSI WebAPI docker containers are downloaded.
+* In a command line / terminal window - navigate to the directory where this `README.md` file is located and start the Broadsea Docker containers using the below command. On Linux you may need to use 'sudo' to run this command. Wait up to one minute for the Docker containers to start. The `docker-compose pull` command ensures that the latest released versions of the OHDSI Atlas and OHDSI WebAPI docker containers are downloaded.
 
-```
-docker compose pull && docker-compose --profile default up --build -d
+```Shell
+docker-compose pull
+docker-compose --profile default up --build -d
 ```
 OR the longer version
+```Shell
+docker-compose pull
+docker-compose --profile atlas-from-image --profile webapi-local --profile atlasdb --profile content up --build -d
 ```
-docker-compose pull && docker-compose --profile atlas-from-image --profile webapi-local --profile atlasdb --profile content up --build -d
-```
+
 * In your web browser open the URL: ```"http://127.0.0.1"```
+* 
 * Once the broadsea-atlasdb service is running, add the IRIS connection details using the following command:
-```
+```Shell
 docker-compose exec broadsea-atlasdb psql -U postgres -f /docker-entrypoint-initdb.d/200_populate_source_source_daimon.sql
 ```
 
@@ -68,12 +73,13 @@ In Section 1 of the .env file, set BROADSEA_HOST as the IP address or host name 
 
 ### Docker profiles
 
-This docker compose file makes use of [Docker profiles](https://docs.docker.com/compose/profiles/ "Docker Profiles") to allow for either a full default deployment ("default"), or a more a-la-carte approach in which you can pick and choose which services you'd like to deploy.
+This docker compose file makes use of [Docker profiles](https://docs.docker.com/compose/profiles/) to allow for either a full default deployment ("default"), or a more a-la-carte approach in which you can pick and choose which services you'd like to deploy.
 
 You can use this syntax for this approach, substituting profile names in:
 
-```
-docker compose pull && docker-compose --profile profile1 --profile profile2 .... up -d
+```Shell
+docker-compose pull 
+docker-compose --profile profile1 --profile profile2 .... up -d
 ```
 
 Here are the profiles available:
