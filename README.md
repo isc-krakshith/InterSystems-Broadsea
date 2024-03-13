@@ -32,29 +32,31 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 * Download and install Docker. See the installation instructions at the [Docker Web Site](https://docs.docker.com/engine/installation/)
   
 * git clone this GitHub repo:
-```Shell
-git clone https://github.com/isc-krakshith/InterSystems-Broadsea.git
-```
-* Update `./WebAPI/scripts/200_populate_source_source_daimon.sql` with the details of the IRIS instance where the [OMOP CDM](https://github.com/OHDSI/CommonDataModel) is deployed, within the connection string. Please note that `host.docker.internal` is a reserved hostname that will resolve to the host where Docker is running, exposing its publicly available ports. This Broadsea setup assumes that server is already up and running.
+  ```Shell
+  git clone https://github.com/isc-krakshith/InterSystems-Broadsea.git
+  ```
+  
+* Update `./WebAPI/scripts/200_populate_source_source_daimon.sql` with the details of the IRIS instance where the [OMOP CDM](https://github.com/OHDSI/CommonDataModel) is deployed, within the connection string. Please note that `host.docker.internal` is a reserved hostname that will resolve to the host where Docker is running, exposing its publicly available ports. This Broadsea setup assumes that server is already up and running. If needed, update the schema names for the CDM, vocabulary and results portions of the CDM.
+  
+* Optionally update the port mappings in `docker-compose.yml` if you have any of the defaults already taken (e.g. 80).
 
 * In a command line / terminal window - navigate to the directory where this `README.md` file is located and start the Broadsea Docker containers using the below command. On Linux you may need to use 'sudo' to run this command. Wait up to one minute for the Docker containers to start. The `docker-compose pull` command ensures that the latest released versions of the OHDSI Atlas and OHDSI WebAPI docker containers are downloaded.
-
-```Shell
-docker-compose pull
-docker-compose --profile default up --build -d
-```
-OR the longer version
-```Shell
-docker-compose pull
-docker-compose --profile atlas-from-image --profile webapi-local --profile atlasdb --profile content up --build -d
-```
+  ```Shell
+  docker-compose pull
+  docker-compose --profile default up --build -d
+  ```
+  OR the longer version
+  ```Shell
+  docker-compose pull
+  docker-compose --profile atlas-from-image --profile webapi-local --profile atlasdb --profile content up --build -d
+  ```
 
 * In your web browser open the URL: ```"http://127.0.0.1"```
-* 
+ 
 * Once the broadsea-atlasdb service is running, add the IRIS connection details using the following command:
-```Shell
-docker-compose exec broadsea-atlasdb psql -U postgres -f /docker-entrypoint-initdb.d/200_populate_source_source_daimon.sql
-```
+  ```Shell
+  docker-compose exec broadsea-atlasdb psql -U postgres -f /docker-entrypoint-initdb.d/200_populate_source_source_daimon.sql
+  ```
 
 * Click on the Atlas link to open Atlas in a new browser window
 * Click on the Hades link to open HADES (RStudio) in a new browser window.
