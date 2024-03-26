@@ -63,6 +63,8 @@ services:
     ports:
       - "8787:8787"
       - "6311:6311"
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   # Atlas service based on the standard Docker Hub images -------------
   ohdsi-atlas-from-image:

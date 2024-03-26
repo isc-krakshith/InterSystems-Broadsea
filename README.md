@@ -57,10 +57,17 @@ AND, within Docker Desktop settings, under "Features in development", check the 
   ```Shell
   docker-compose exec broadsea-atlasdb psql -U postgres -f /docker-entrypoint-initdb.d/200_populate_source_source_daimon.sql
   ```
+* Next, call the follwoing API in your browser to refresh the values in the atlas front-end:
+```"http://127.0.0.1/WebAPI/source/refresh/"```
 
 * Click on the Atlas link to open Atlas in a new browser window
 * Click on the Hades link to open HADES (RStudio) in a new browser window.
   * The RStudio userid is 'ohdsi' and the password is 'mypass'
+
+* To make available IRIS JDBC connector to the Hades solution run the following shell command:
+```
+docker cp ./WebAPI/assets/intersystems-jdbc-3.7.1.jar broadsea-hades:/opt/hades/jdbc_drivers/
+```
 
 
 ## Broadsea - Advanced Usage
