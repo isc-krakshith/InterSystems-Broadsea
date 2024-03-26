@@ -66,7 +66,7 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 
 * To make available IRIS JDBC connector to the Hades solution run the following shell command:
 ```
-docker cp ./WebAPI/assets/intersystems-jdbc-3.7.1.jar broadsea-hades:/opt/hades/jdbc_drivers/
+docker cp ./WebAPI/assets/intersystems-jdbc-3.8.4.jar broadsea-hades:/opt/hades/jdbc_drivers/
 ```
 
 
