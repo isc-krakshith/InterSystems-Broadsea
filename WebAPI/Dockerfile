@@ -12,9 +12,9 @@ FROM openjdk:8-jre-slim
 MAINTAINER Benjamin DeBoe
 
 # Any Java options to pass along, e.g. memory, garbage collection, etc.
-ENV JAVA_OPTS=""
+ENV JAVA_OPTS="-Dcom.intersystems.SSLConfigFile=/var/lib/ohdsi/webapi/SSLConfig.properties"
 # Additional classpath parameters to pass along. If provided, start with colon ":"
-ENV CLASSPATH=":/var/lib/ohdsi/webapi/WEB-INF/lib/"
+ENV CLASSPATH=":/var/lib/ohdsi/webapi/WEB-INF/lib/:/varlib/ohdsi/webapi/"
 # Default Java options. The first entry is a fix for when java reads secure random numbers:
 # in a containerized system using /dev/random may reduce entropy too much, causing slowdowns.
 ENV DEFAULT_JAVA_OPTS="-Djava.security.egd=file:///dev/./urandom"
@@ -32,6 +32,12 @@ COPY --from=builder /war/WEB-INF/classes WEB-INF/classes
 COPY --from=builder /war/META-INF META-INF
 
 COPY ./assets/intersystems-jdbc-3.8.4.jar /var/lib/ohdsi/webapi/WEB-INF/lib/
+
+#setup and import ssl cert into java
+COPY ./iriscert/certificateSQLaaS.pem .
+COPY ./iriscert/SSLConfig.properties .
+RUN keytool -importcert -file /var/lib/ohdsi/webapi/certificateSQLaaS.pem -alias IRIScert -keystore /var/lib/ohdsi/webapi/keystore.jks -storepass changeit -noprompt
+RUN rm /var/lib/ohdsi/webapi/certificateSQLaaS.pem
 
 EXPOSE 8080
 

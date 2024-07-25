@@ -37,8 +37,10 @@ AND, within Docker Desktop settings, under "Features in development", check the 
   ```
   
 * Update `./WebAPI/scripts/200_populate_source_source_daimon.sql` with the details of the IRIS instance where the [OMOP CDM](https://github.com/OHDSI/CommonDataModel) is deployed, within the connection string. Please note that `host.docker.internal` is a reserved hostname that will resolve to the host where Docker is running, exposing its publicly available ports. This Broadsea setup assumes that server is already up and running. If needed, update the schema names for the CDM, vocabulary and results portions of the CDM.
-  
+
 * Optionally update the port mappings in `docker-compose.yml` if you have any of the defaults already taken (e.g. 80).
+
+* TLS Connectivity: If connection to InterSystem IRIS data source will be made over TLS, place the private key file contents within WebAPI/iriscert/certificateSQLSaas.pem. This is very likely the scenario in which a connection is to be made to InterSystems OMOP Platform Service deployed via InterSystems cloud portal.
 
 * In a command line / terminal window - navigate to the directory where this `README.md` file is located and start the Broadsea Docker containers using the below command. On Linux you may need to use 'sudo' to run this command. Wait up to one minute for the Docker containers to start. The `docker-compose pull` command ensures that the latest released versions of the OHDSI Atlas and OHDSI WebAPI docker containers are downloaded.
   ```Shell
@@ -55,7 +57,7 @@ AND, within Docker Desktop settings, under "Features in development", check the 
  
 * Once the broadsea-atlasdb service is running, add the IRIS connection details using the following command:
   ```Shell
-  docker-compose exec broadsea-atlasdb psql -U postgres -f /docker-entrypoint-initdb.d/200_populate_source_source_daimon.sql
+  docker-compose exec broadsea-atlasdb psql -U postgres -f "/docker-entrypoint-initdb.d/200_populate_source_source_daimon.sql"
   ```
 * Next, call the follwoing API in your browser to refresh the values in the atlas front-end:
 ```"http://127.0.0.1/WebAPI/source/refresh/"```
@@ -200,7 +202,7 @@ To adjust which app links to display on the Broadsea content page ("/"), refer t
 ## Shutdown Broadsea
 You can stop the running Docker containers & remove them (new container instances can be started again later) with this command:
 ```
-docker compose down
+docker compose --profile <profiles specified at startup> down
 ```
 
 
