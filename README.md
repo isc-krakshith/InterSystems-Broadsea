@@ -66,11 +66,13 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 * Click on the Hades link to open HADES (RStudio) in a new browser window.
   * The RStudio userid is 'ohdsi' and the password is 'mypass'
 
-* To make available IRIS JDBC connector to the Hades solution run the following shell commands:
+* To make available IRIS JDBC connector to the Hades solution run the following shell commands to upload InterSystems IRIS jdbc and sql render jar file:
 ```
 docker cp ./WebAPI/assets/intersystems-jdbc-3.8.4.jar broadsea-hades:/opt/hades/jdbc_drivers/
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/SqlRender/java/SqlRender.jar
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/FeatureExtraction/java/
+docker cp ./WebAPI/iriscert/certificateSQLaaS.pem broadsea-hades:/home/ohdsi/
+docker cp ./WebAPI/iriscert/SSLConfigHades.properties broadsea-hades:/home/ohdsi/SSLConfig.properties
 ```
 The next few commands need to be executed on the Hades container, so lets open a shell in that container
 ```
@@ -78,7 +80,11 @@ docker exec --user root -it broadsea-hades bash
 ```
 Now we find ourselves in the shell of the Hades container
 ```
-#we need to remove the standard sqlrender jar file
+#import private key into keystore
+keytool -importcert -file /home/ohdsi/certificateSQLaaS.pem -keystore /home/ohdsi/keystore.jks -alias IRIScert -storepass changeit -noprompt
+# remove the original certificate
+rm /home/ohdsi/certificateSQLaaS.pem
+#also remove the default sqlrender jar file
 rm /usr/local/lib/R/site-library/FeatureExtraction/java/SqlRender-1.7.0.jar
 ```
 
