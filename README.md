@@ -66,11 +66,21 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 * Click on the Hades link to open HADES (RStudio) in a new browser window.
   * The RStudio userid is 'ohdsi' and the password is 'mypass'
 
-* To make available IRIS JDBC connector to the Hades solution run the following shell command:
+* To make available IRIS JDBC connector to the Hades solution run the following shell commands:
 ```
 docker cp ./WebAPI/assets/intersystems-jdbc-3.8.4.jar broadsea-hades:/opt/hades/jdbc_drivers/
+docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/SqlRender/java/SqlRender.jar
+docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/FeatureExtraction/java/
 ```
-
+The next few commands need to be executed on the Hades container, so lets open a shell in that container
+```
+docker exec --user root -it broadsea-hades bash
+```
+Now we find ourselves in the shell of the Hades container
+```
+#we need to remove the standard sqlrender jar file
+rm /usr/local/lib/R/site-library/FeatureExtraction/java/SqlRender-1.7.0.jar
+```
 
 ## Broadsea - Advanced Usage
 
@@ -194,6 +204,24 @@ To mount files prepared for Ares (see [Ares GitHub IO](https://ohdsi.github.io/A
 ### HADES RStudio default login
 
 The credentials for the RStudio user can be established in Section 8 of the .env file.
+
+####
+The following instructions are provided in good faith currently:
+Once logged in the following R commands are to be run to see output in Atlas dashboard
+```
+remotes::install_github("intersystems-community/OHDSI-DatabaseConnector", force = TRUE)
+remotes::install_github("intersystems-community/OHDSI-SqlRender")
+library(DatabaseConnector)
+library(SqlRender)
+library(Andromeda)
+library(Achilles)
+connection <- DatabaseConnector::connect(dbms = "iris", user = "<iris_username>", password = "<password>", connectionString = "jdbc:IRIS://<hostname>.elb.us-west-2.amazonaws.com:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"))
+```
+Now set achilles the task of querying the OMOP dataset and computing the results in the results schema:
+```
+achilles(connectionDetails = connectionDetails, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output")
+```
+And that's it... if it worked then Atlas dashboards should be populated!
 
 ### Broadsea Content Page
 
