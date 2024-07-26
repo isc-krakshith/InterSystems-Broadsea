@@ -213,7 +213,7 @@ The credentials for the RStudio user can be established in Section 8 of the .env
 
 ####
 The following instructions are provided in good faith currently:
-Once logged in the following R commands are to be run to see output in Atlas dashboard
+Once logged in, the following R commands need to be run in the R Studio Console to populate Atlas dashboards
 ```
 remotes::install_github("intersystems-community/OHDSI-DatabaseConnector", force = TRUE)
 remotes::install_github("intersystems-community/OHDSI-SqlRender")
@@ -225,9 +225,9 @@ connection <- DatabaseConnector::connect(dbms = "iris", user = "<iris_username>"
 ```
 Now set achilles the task of querying the OMOP dataset and computing the results in the results schema:
 ```
-achilles(connectionDetails = connectionDetails, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output")
+achilles(connectionDetails = connection, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output")
 ```
-And that's it... if it worked then Atlas dashboards should be populated!
+And that's it... give it time to complete. And if there are no errors reported, then Atlas dashboards should be populated!
 
 ### Broadsea Content Page
 
