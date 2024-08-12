@@ -66,7 +66,7 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 * Click on the Hades link to open HADES (RStudio) in a new browser window.
   * The RStudio userid is 'ohdsi' and the password is 'mypass'
 
-* To make available IRIS JDBC connector to the Hades solution run the following shell commands to upload InterSystems IRIS jdbc and sql render jar file:
+* To make available IRIS JDBC connector to the Hades solution run the following shell commands to copy InterSystems IRIS jdbc and sql render jar file into the hades container:
 ```
 docker cp ./WebAPI/assets/intersystems-jdbc-3.8.4.jar broadsea-hades:/opt/hades/jdbc_drivers/
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/SqlRender/java/SqlRender.jar
@@ -86,7 +86,10 @@ keytool -importcert -file /home/ohdsi/certificateSQLaaS.pem -keystore /home/ohds
 rm /home/ohdsi/certificateSQLaaS.pem
 #also remove the default sqlrender jar file
 rm /usr/local/lib/R/site-library/FeatureExtraction/java/SqlRender-1.7.0.jar
+#logout from the container shell
+exit
 ```
+[And follow the steps for using Hades...](#hades-rstudio-default-login)
 
 ## Broadsea - Advanced Usage
 
@@ -209,7 +212,7 @@ To mount files prepared for Ares (see [Ares GitHub IO](https://ohdsi.github.io/A
 
 ### HADES RStudio default login
 
-The credentials for the RStudio user can be established in Section 8 of the .env file.
+[Access Hades UI here](http://127.0.0.1/hades) The credentials for the RStudio user can be established in Section 8 of the .env file.
 
 ####
 The following instructions are provided in good faith currently:
@@ -219,6 +222,7 @@ remotes::install_github("intersystems-community/OHDSI-DatabaseConnector", force 
 remotes::install_github("intersystems-community/OHDSI-SqlRender")
 library(DatabaseConnector)
 library(SqlRender)
+remotes::install_github("OHDSI/Achilles")
 library(Andromeda)
 library(Achilles)
 connection <- DatabaseConnector::connect(dbms = "iris", user = "<iris_username>", password = "<password>", connectionString = "jdbc:IRIS://<hostname>.elb.us-west-2.amazonaws.com:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"))
