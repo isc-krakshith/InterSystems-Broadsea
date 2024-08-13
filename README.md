@@ -215,21 +215,21 @@ To mount files prepared for Ares (see [Ares GitHub IO](https://ohdsi.github.io/A
 [Access Hades UI here](http://127.0.0.1/hades) The credentials for the RStudio user can be established in Section 8 of the .env file.
 
 ####
-The following instructions are provided in good faith currently:
-Once logged in, the following R commands need to be run in the R Studio Console to populate Atlas dashboards
+Once logged in to R Studio, the following R commands need to be run in the Console to populate Atlas dashboards. It will be OK to select option 3 (None) when prompted to upgrade packages:
 ```
+install.packages('Andromeda')
+remotes::install_github("OHDSI/Achilles")
 remotes::install_github("intersystems-community/OHDSI-DatabaseConnector", force = TRUE)
 remotes::install_github("intersystems-community/OHDSI-SqlRender")
-library(DatabaseConnector)
-library(SqlRender)
-remotes::install_github("OHDSI/Achilles")
 library(Andromeda)
 library(Achilles)
-connection <- DatabaseConnector::connect(dbms = "iris", user = "<iris_username>", password = "<password>", connectionString = "jdbc:IRIS://<hostname>.elb.us-west-2.amazonaws.com:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"))
+library(DatabaseConnector)
+library(SqlRender)
+connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "<iris_username>", password = "<password>", connectionString = "jdbc:IRIS://<hostname>.elb.us-west-2.amazonaws.com:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
 ```
 Now set achilles the task of querying the OMOP dataset and computing the results in the results schema:
 ```
-achilles(connectionDetails = connection, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output")
+achilles(connectionDetails = connectionDetails, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output")
 ```
 And that's it... give it time to complete. And if there are no errors reported, then Atlas dashboards should be populated!
 
