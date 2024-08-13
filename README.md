@@ -66,6 +66,10 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 * Click on the Hades link to open HADES (RStudio) in a new browser window.
   * The RStudio userid is 'ohdsi' and the password is 'mypass'
 
+* Generate SQL script to create tables for storing results of achilles analysis by calling this API in your browser:
+```http://127.0.0.1/WebAPI/ddl/results?dialect=iris&schema=OMOPCDM54_RESULTS&vocabSchema=OMOPCDM54&tempSchema=OMOP_TEMP&initConceptHierarchy=true```
+  * Then copy the SQL script from your browser and run it in a SQL client connected to your IRIS instance
+
 * To make available IRIS JDBC connector to the Hades solution run the following shell commands to copy InterSystems IRIS jdbc and sql render jar file into the hades container:
 ```
 docker cp ./WebAPI/assets/intersystems-jdbc-3.8.4.jar broadsea-hades:/opt/hades/jdbc_drivers/
