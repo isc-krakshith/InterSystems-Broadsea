@@ -27,6 +27,15 @@ If using Mac Silicon (M1, M2), set the DOCKER_ARCH variable in Section 1 of the 
 However, if using webapi-local or webapi-from-image profiles set DOCKER_ARCH = "linux/amd64"
 AND, within Docker Desktop settings, under "Features in development", check the box: "Use Rosetta for x86/amd64 emulation on Apple Silicon"
 
+### Broadsea Host Location
+Will the Broadsea application be accessed remotely? Then you will need to change the BROADSEA_HOST parameter in the .env file to match the host url. Do please note that, in this case, the application will not be accessible locally on the host where it is running.
+
+### TLS Connectivity
+If connection to InterSystem IRIS data source will be made over TLS, place the private key file contents within WebAPI/iriscert/certificateSQLSaas.pem. This is very likely the scenario in which a connection is to be made to InterSystems OMOP Platform Service deployed via InterSystems cloud portal. Then set TLS to True in docker-compose within the ohdsi-webapi-local service, like so:
+```
+      args:
+        TLS: True
+```
 ## Broadsea - Quick start
 
 * Download and install Docker. See the installation instructions at the [Docker Web Site](https://docs.docker.com/engine/installation/)
@@ -39,16 +48,6 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 * Update `./WebAPI/scripts/200_populate_source_source_daimon.sql` with the details of the IRIS instance where the [OMOP CDM](https://github.com/OHDSI/CommonDataModel) is deployed, within the connection string. Please note that `host.docker.internal` is a reserved hostname that will resolve to the host where Docker is running, exposing its publicly available ports. This Broadsea setup assumes that server is already up and running. If needed, update the schema names for the CDM, vocabulary and results portions of the CDM.
 
 * Optionally update the port mappings in `docker-compose.yml` if you have any of the defaults already taken (e.g. 80).
-
-### Broadsea Host Location
-Will the Broadsea application be accessed remotely? Then you will need to change the BROADSEA_HOST parameter in the .env file to match the host url. Do please note that, in this case, the application will not be accessible locally on the host where it is running.
-
-### TLS Connectivity
-If connection to InterSystem IRIS data source will be made over TLS, place the private key file contents within WebAPI/iriscert/certificateSQLSaas.pem. This is very likely the scenario in which a connection is to be made to InterSystems OMOP Platform Service deployed via InterSystems cloud portal. Then set TLS to True in docker-compose within the ohdsi-webapi-local service, like so:
-```
-      args:
-        TLS: True
-```
 
 * In a command line / terminal window - navigate to the directory where this `README.md` file is located and start the Broadsea Docker containers using the below command. On Linux you may need to use 'sudo' to run this command. Wait up to one minute for the Docker containers to start. The `docker-compose pull` command ensures that the latest released versions of the OHDSI Atlas and OHDSI WebAPI docker containers are downloaded.
   ```Shell
