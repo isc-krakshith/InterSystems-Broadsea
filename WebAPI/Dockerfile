@@ -8,6 +8,7 @@ RUN jar -xf WebAPI.war \
 
 # OHDSI WebAPI and ATLAS web application running as a Spring Boot application with Java 11
 FROM openjdk:8-jre-slim
+ARG TLS
 
 MAINTAINER Benjamin DeBoe
 
@@ -33,11 +34,13 @@ COPY --from=builder /war/META-INF META-INF
 
 COPY ./assets/intersystems-jdbc-3.8.4.jar /var/lib/ohdsi/webapi/WEB-INF/lib/
 
-#setup and import ssl cert into java
-COPY ./iriscert/certificateSQLaaS.pem .
-COPY ./iriscert/SSLConfig.properties .
-RUN keytool -importcert -file /var/lib/ohdsi/webapi/certificateSQLaaS.pem -alias IRIScert -keystore /var/lib/ohdsi/webapi/keystore.jks -storepass changeit -noprompt
-RUN rm /var/lib/ohdsi/webapi/certificateSQLaaS.pem
+RUN if [ $TLS = "True" ]; then \
+    #setup and import ssl cert into java
+    COPY ./iriscert/certificateSQLaaS.pem . && \
+    COPY ./iriscert/SSLConfig.properties . && \
+    RUN keytool -importcert -file /var/lib/ohdsi/webapi/certificateSQLaaS.pem -alias IRIScert -keystore /var/lib/ohdsi/webapi/keystore.jks -storepass changeit -noprompt && \
+    RUN rm /var/lib/ohdsi/webapi/certificateSQLaaS.pem; \
+    fi
 
 EXPOSE 8080
 

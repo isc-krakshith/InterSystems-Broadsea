@@ -79,6 +79,8 @@ services:
     profiles: [ "default", "webapi-local" ]
     build: 
       context: ./WebAPI
+      args:
+        TLS: False
     extends: 
       file: "ohdsi-webapi.yml"
       service: ohdsi-webapi

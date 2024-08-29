@@ -40,7 +40,11 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 
 * Optionally update the port mappings in `docker-compose.yml` if you have any of the defaults already taken (e.g. 80).
 
-* TLS Connectivity: If connection to InterSystem IRIS data source will be made over TLS, place the private key file contents within WebAPI/iriscert/certificateSQLSaas.pem. This is very likely the scenario in which a connection is to be made to InterSystems OMOP Platform Service deployed via InterSystems cloud portal.
+* TLS Connectivity: If connection to InterSystem IRIS data source will be made over TLS, place the private key file contents within WebAPI/iriscert/certificateSQLSaas.pem. This is very likely the scenario in which a connection is to be made to InterSystems OMOP Platform Service deployed via InterSystems cloud portal. Then set TLS to True in docker-compose within the ohdsi-webapi-local service, like so:
+```
+      args:
+        TLS: True
+```
 
 * In a command line / terminal window - navigate to the directory where this `README.md` file is located and start the Broadsea Docker containers using the below command. On Linux you may need to use 'sudo' to run this command. Wait up to one minute for the Docker containers to start. The `docker-compose pull` command ensures that the latest released versions of the OHDSI Atlas and OHDSI WebAPI docker containers are downloaded.
   ```Shell
@@ -59,7 +63,7 @@ AND, within Docker Desktop settings, under "Features in development", check the 
   ```Shell
   docker-compose exec broadsea-atlasdb psql -U postgres -f "/docker-entrypoint-initdb.d/200_populate_source_source_daimon.sql"
   ```
-* Next, call the follwoing API in your browser to refresh the values in the atlas front-end:
+* Next, call the following API in your browser to refresh the values in the atlas front-end:
 ```"http://127.0.0.1/WebAPI/source/refresh/"```
 
 * Click on the Atlas link to open Atlas in a new browser window
@@ -75,20 +79,27 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 docker cp ./WebAPI/assets/intersystems-jdbc-3.8.4.jar broadsea-hades:/opt/hades/jdbc_drivers/
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/SqlRender/java/SqlRender.jar
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/FeatureExtraction/java/
+```
+If you are connecting to IRIS over TLS, then execute the following commands[, otherwise skip to the instructions to be executed within Hades container](#within-hades-container):
+```
 docker cp ./WebAPI/iriscert/certificateSQLaaS.pem broadsea-hades:/home/ohdsi/
 docker cp ./WebAPI/iriscert/SSLConfigHades.properties broadsea-hades:/home/ohdsi/SSLConfig.properties
 ```
+### Within Hades container
 The next few commands need to be executed on the Hades container, so lets open a shell in that container
 ```
 docker exec --user root -it broadsea-hades bash
 ```
-Now we find ourselves in the shell of the Hades container
+Now we find ourselves in the shell of the Hades container. If you are connecting to IRIS over TLS, then execute the following commands[, otherwise skip to the instructions to remove default sqlrender jar](#remove-default-sqlrender-jar)
 ```
 #import private key into keystore
 keytool -importcert -file /home/ohdsi/certificateSQLaaS.pem -keystore /home/ohdsi/keystore.jks -alias IRIScert -storepass changeit -noprompt
 # remove the original certificate
 rm /home/ohdsi/certificateSQLaaS.pem
-#also remove the default sqlrender jar file
+```
+### Remove default sqlrender jar
+```
+#remove the default sqlrender jar file
 rm /usr/local/lib/R/site-library/FeatureExtraction/java/SqlRender-1.7.0.jar
 #logout from the container shell
 exit
