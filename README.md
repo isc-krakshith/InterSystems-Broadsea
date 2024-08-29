@@ -40,7 +40,11 @@ AND, within Docker Desktop settings, under "Features in development", check the 
 
 * Optionally update the port mappings in `docker-compose.yml` if you have any of the defaults already taken (e.g. 80).
 
-* TLS Connectivity: If connection to InterSystem IRIS data source will be made over TLS, place the private key file contents within WebAPI/iriscert/certificateSQLSaas.pem. This is very likely the scenario in which a connection is to be made to InterSystems OMOP Platform Service deployed via InterSystems cloud portal. Then set TLS to True in docker-compose within the ohdsi-webapi-local service, like so:
+### Broadsea Host Location
+Will the Broadsea application be accessed remotely? Then you will need to change the BROADSEA_HOST parameter in the .env file to match the host url. Do please note that, in this case, the application will not be accessible locally on the host where it is running.
+
+### TLS Connectivity
+If connection to InterSystem IRIS data source will be made over TLS, place the private key file contents within WebAPI/iriscert/certificateSQLSaas.pem. This is very likely the scenario in which a connection is to be made to InterSystems OMOP Platform Service deployed via InterSystems cloud portal. Then set TLS to True in docker-compose within the ohdsi-webapi-local service, like so:
 ```
       args:
         TLS: True
