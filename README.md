@@ -243,7 +243,7 @@ library(Andromeda)
 library(DatabaseConnector)
 library(Achilles)
 library(SqlRender)
-connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "<iris_username>", password = "<password>", connectionString = "jdbc:IRIS://<hostname>.elb.us-west-2.amazonaws.com:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
+connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "<iris_username>", password = "<password>", connectionString = "jdbc:IRIS://<host address>:<port>/USER/:::<true or false to specify if TLS is required>", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
 ```
 Now set achilles the task of querying the OMOP dataset and computing the results in the results schema:
 ```
