@@ -10,7 +10,7 @@ RUN jar -xf WebAPI.war \
 FROM openjdk:8-jre-slim
 ARG TLS
 
-MAINTAINER Benjamin DeBoe
+LABEL Benjamin DeBoe
 
 # Any Java options to pass along, e.g. memory, garbage collection, etc.
 ENV JAVA_OPTS="-Dcom.intersystems.SSLConfigFile=/var/lib/ohdsi/webapi/SSLConfig.properties"
@@ -33,13 +33,16 @@ COPY --from=builder /war/WEB-INF/classes WEB-INF/classes
 COPY --from=builder /war/META-INF META-INF
 
 COPY ./assets/intersystems-jdbc-3.8.4.jar /var/lib/ohdsi/webapi/WEB-INF/lib/
+COPY ./iriscert/certificateSQLaaS.pem .
+COPY ./iriscert/SSLConfig.properties .
 
-RUN if [ $TLS = "True" ]; then \
+RUN if [ "$TLS" = "true" ]; then \
     #setup and import ssl cert into java
-    COPY ./iriscert/certificateSQLaaS.pem . && \
-    COPY ./iriscert/SSLConfig.properties . && \
-    RUN keytool -importcert -file /var/lib/ohdsi/webapi/certificateSQLaaS.pem -alias IRIScert -keystore /var/lib/ohdsi/webapi/keystore.jks -storepass changeit -noprompt && \
-    RUN rm /var/lib/ohdsi/webapi/certificateSQLaaS.pem; \
+    keytool -importcert -file /var/lib/ohdsi/webapi/certificateSQLaaS.pem -alias IRIScert -keystore /var/lib/ohdsi/webapi/keystore.jks -storepass changeit -noprompt && \
+    rm /var/lib/ohdsi/webapi/certificateSQLaaS.pem; \
+    else \
+    rm /var/lib/ohdsi/webapi/SSLConfig.properties && \
+    rm /var/lib/ohdsi/webapi/certificateSQLaaS.pem; \
     fi
 
 EXPOSE 8080

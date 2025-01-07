@@ -80,7 +80,7 @@ services:
     build: 
       context: ./WebAPI
       args:
-        TLS: False
+        TLS: "false"
     extends: 
       file: "ohdsi-webapi.yml"
       service: ohdsi-webapi
