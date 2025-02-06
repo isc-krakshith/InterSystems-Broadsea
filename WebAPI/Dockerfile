@@ -32,7 +32,7 @@ COPY --from=builder /war/org org
 COPY --from=builder /war/WEB-INF/classes WEB-INF/classes
 COPY --from=builder /war/META-INF META-INF
 
-COPY ./assets/intersystems-jdbc-3.8.4.jar /var/lib/ohdsi/webapi/WEB-INF/lib/
+COPY ./assets/intersystems-jdbc-3.10.1.jar /var/lib/ohdsi/webapi/WEB-INF/lib/
 COPY ./iriscert/certificateSQLaaS.pem .
 COPY ./iriscert/SSLConfig.properties .
 

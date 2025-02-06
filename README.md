@@ -79,7 +79,7 @@ If connection to InterSystem IRIS data source will be made over TLS, place the p
 
 * To make available IRIS JDBC connector to the Hades solution run the following shell commands to copy InterSystems IRIS jdbc and sql render jar file into the hades container:
 ```
-docker cp ./WebAPI/assets/intersystems-jdbc-3.8.4.jar broadsea-hades:/opt/hades/jdbc_drivers/
+docker cp ./WebAPI/assets/intersystems-jdbc-3.10.1.jar broadsea-hades:/opt/hades/jdbc_drivers/
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/SqlRender/java/SqlRender.jar
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/FeatureExtraction/java/
 ```
@@ -200,12 +200,12 @@ Broadsea uses Traefik as a proxy for all containers within. Traefik can be set u
 
 ### Atlas/WebAPI Security
 
-To enable a security provider for authentication and identity management in Atlas/WebAPI, review and fill out Sections 4 and 5 in the .env file.
+To enable aHelm chart  security provider for authentication and identity management in Atlas/WebAPI, review and fill out Sections 4 and 5 in the .env file.
 
 #### LDAPS (LDAP over SSL or secure LDAP)
 
 To use a secure LDAP instance, overwrite the blank ./cacerts within the Broadsea directory with your own cacerts file. WebAPI can then leverage it for LDAPS.
-
+Helm chart 
 ### Atlas/WebAPI from Git repo
 
 To build either Atlas or WebAPI from a git repo instead of from Docker Hub, use Section 6 to specify the Git repo paths. Branches and commits can be in the URL after a "#".
@@ -235,20 +235,34 @@ To mount files prepared for Ares (see [Ares GitHub IO](https://ohdsi.github.io/A
 ####
 Once logged in to R Studio, the following R commands need to be run in the Console to populate Atlas dashboards. It will be OK to select option 3 (None) when prompted to upgrade packages:
 ```
-install.packages('Andromeda')
-remotes::install_github("OHDSI/Achilles")
-remotes::install_github("intersystems-community/OHDSI-DatabaseConnector", force = TRUE)
-remotes::install_github("intersystems-community/OHDSI-SqlRender")
-library(Andromeda)
-library(DatabaseConnector)
-library(Achilles)
-library(SqlRender)
-connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "<iris_username>", password = "<password>", connectionString = "jdbc:IRIS://<host address>:<port>/USER/:::<true or false to specify if TLS is required>", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
+source("/home/ohdsi/hades_setup.r")
+connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "SQLAdmin", password = "<PASSWORD>", connectionString = "jdbc:IRIS://k8s-0a6bc2ca-adb040ad-c7bf2ee7c6-e6b05ee242f76bf2.elb.us-east-1.amazonaws.com:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
+conn <- connect(connectionDetails)
+ddl_script <- readChar("omop.ddl", file.info("omop.ddl")$size)
+executeSql(conn, ddl_script)
 ```
 Now set achilles the task of querying the OMOP dataset and computing the results in the results schema:
 ```
-achilles(connectionDetails = connectionDetails, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output")
+achilles(connectionDetails = connectionDetails, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output", optimizeAtlasCache = TRUE, createTable = TRUE,  scratchDatabaseSchema = "OMOPCDM54_SCRATCH", numThreads = 5)
+
+createIndices(connectionDetails = connectionDetails, 
+              resultsDatabaseSchema = "OMOPCDM54_RESULTS", 
+              outputFolder = "output2")
 ```
+
+wow
+
+```
+CREATE TABLE OMOPCDM54_RESULTS.ACHILLES_RESULTS (
+    analysis_id INT,
+    stratum_1 VARCHAR(255),
+    stratum_2 VARCHAR(255),
+    count_value INT
+);
+```
+
+
+# , sqlOnly = TRUE)
 And that's it... give it time to complete. And if there are no errors reported, then Atlas dashboards should be populated!
 
 ### Broadsea Content Page
