@@ -1,5 +1,6 @@
 docker-compose --profile default down
-docker volume prune -a -f
+# Danger Will Robinson, uncomment
+#docker volume prune -a -f
 sleep 5
 docker-compose pull
 docker-compose --profile default up --build -d
@@ -7,7 +8,7 @@ sleep 45
 ## POST CONFIGURATION
 docker-compose exec broadsea-atlasdb psql -U postgres -f "/docker-entrypoint-initdb.d/200_populate_source_source_daimon.sql"
 # 
-docker cp ./WebAPI/assets/intersystems-jdbc-3.10.1.jar broadsea-hades:/opt/hades/jdbc_drivers/
+docker cp ./WebAPI/assets/intersystems-jdbc-3.10.3.jar broadsea-hades:/opt/hades/jdbc_drivers/
 ##docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/SqlRender/java/SqlRender.jar
 ##docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/FeatureExtraction/java/
 ##

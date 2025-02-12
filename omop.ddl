@@ -2519,48 +2519,48 @@ NULL as stratum_5_name,
 CAST('HEALTHCARE_UTILIZATION' as VARCHAR(255)) as analysis_type
 ;
 
-CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.egctnzandigits
+CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.b9ulth36digits
  AS SELECT digits.n   FROM (
        select 0 as n union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9
 ) digits;
 
-CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.egctnzangenerate_dates
+CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.b9ulth36generate_dates
  AS SELECT y1.n + (10*y10.n) + (100*y100.n) + (1000*y1000.n) AS d_years,
 	mths.n as d_months
- FROM OMOP_TEMP.egctnzandigits y1,
-OMOP_TEMP.egctnzandigits y10,
+ FROM OMOP_TEMP.b9ulth36digits y1,
+OMOP_TEMP.b9ulth36digits y10,
 (select 0 n union all select 1 union all select 9) y100,
 (select 1 n union all select 2) y1000,
 (select 1 n union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9 union all select 10 union all select 11 union all select 12) mths
 	where y1.n + (10*y10.n) + (100*y100.n) + (1000*y1000.n) >= 1900 and y1.n + (10*y10.n) + (100*y100.n) + (1000*y1000.n) < 2100
 ;
 
-CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.egctnzanyearly_dates
+CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.b9ulth36yearly_dates
  AS SELECT TO_DATE(TO_CHAR(d_years,'FM0000')||'-'||TO_CHAR(d_months,'FM00')||'-'||TO_CHAR(01,'FM00'), 'YYYY-MM-DD') as generated_date
- FROM OMOP_TEMP.egctnzangenerate_dates
+ FROM OMOP_TEMP.b9ulth36generate_dates
 where d_months = 1
 ;
 
-CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.egctnzanmonthly_dates
+CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.b9ulth36monthly_dates
  AS SELECT TO_DATE(TO_CHAR(d_years,'FM0000')||'-'||TO_CHAR(d_months,'FM00')||'-'||TO_CHAR(01,'FM00'), 'YYYY-MM-DD') as generated_date
- FROM OMOP_TEMP.egctnzangenerate_dates
+ FROM OMOP_TEMP.b9ulth36generate_dates
 ;
 
-CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.egctnzanweekly_dates
+CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.b9ulth36weekly_dates
  AS SELECT  TO_DATE(DATEADD(d, (7 * seq.rn), TO_DATE(TO_CHAR(1900,'FM0000')||'-'||TO_CHAR(1,'FM00')||'-'||TO_CHAR(7,'FM00'), 'YYYY-MM-DD')),'YYYY-MM-DD HH:MI:SS') as  generated_date -- first sunday in 1900
  FROM (
 	select  d1.n + (10 * d10.n) + (100 * d100.n) + (1000 * d1000.n) as rn
-	from OMOP_TEMP.egctnzandigits d1, OMOP_TEMP.egctnzandigits d10, OMOP_TEMP.egctnzandigits d100, OMOP_TEMP.egctnzandigits d1000
+	from OMOP_TEMP.b9ulth36digits d1, OMOP_TEMP.b9ulth36digits d10, OMOP_TEMP.b9ulth36digits d100, OMOP_TEMP.b9ulth36digits d1000
 ) seq;
 
-CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.egctnzanquarterly_dates
+CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.b9ulth36quarterly_dates
 	 AS SELECT TO_DATE(TO_CHAR(d_years,'FM0000')||'-'||TO_CHAR(d_months,'FM00')||'-'||TO_CHAR(1,'FM00'), 'YYYY-MM-DD') as generated_date
- FROM OMOP_TEMP.egctnzangenerate_dates
+ FROM OMOP_TEMP.b9ulth36generate_dates
 	where d_months in (1,4,7,10)
 ;
 
 -- monthly dates
-CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.egctnzantemp_period
+CREATE GLOBAL TEMPORARY TABLE OMOP_TEMP.b9ulth36temp_period
  AS SELECT *
  FROM (
 select CAST('Monthly' AS VARCHAR(255)) as period_name
@@ -2568,14 +2568,14 @@ select CAST('Monthly' AS VARCHAR(255)) as period_name
   , CAST( 'mm' AS VARCHAR(50)) as period_type
   , md.generated_date as period_start_date
   ,  TO_DATE(DATEADD(mm, 1, md.generated_date),'YYYY-MM-DD HH:MI:SS') as  period_end_date
-from OMOP_TEMP.egctnzanmonthly_dates md
+from OMOP_TEMP.b9ulth36monthly_dates md
 UNION ALL
 select CAST('Weekly' AS VARCHAR(255)) as period_name
   , 2 as period_order
   , CAST('ww' AS VARCHAR(50)) as period_type
   , wd.generated_date as period_start_date
   ,  TO_DATE(DATEADD(d, 7, wd.generated_date),'YYYY-MM-DD HH:MI:SS') as  period_end_date
-from OMOP_TEMP.egctnzanweekly_dates wd
+from OMOP_TEMP.b9ulth36weekly_dates wd
 where wd.generated_date >= TO_DATE(TO_CHAR(1900,'FM0000')||'-'||TO_CHAR(1,'FM00')||'-'||TO_CHAR(1,'FM00'), 'YYYY-MM-DD') and wd.generated_date < TO_DATE(TO_CHAR(2100,'FM0000')||'-'||TO_CHAR(1,'FM00')||'-'||TO_CHAR(1,'FM00'), 'YYYY-MM-DD')
 UNION ALL
 select CAST('Quarterly' AS VARCHAR(255)) as period_name
@@ -2583,14 +2583,14 @@ select CAST('Quarterly' AS VARCHAR(255)) as period_name
   , CAST('qq' AS VARCHAR(50)) as period_type
   , qd.generated_date as period_start_date
   ,  TO_DATE(DATEADD(mm, 3, qd.generated_date),'YYYY-MM-DD HH:MI:SS') as  period_end_date
-from OMOP_TEMP.egctnzanquarterly_dates qd
+from OMOP_TEMP.b9ulth36quarterly_dates qd
 UNION ALL
 select CAST('Yearly' AS VARCHAR(255)) as period_name
   , 4 as period_order
   , CAST('yy' AS VARCHAR(50)) as period_type
   , yd.generated_date as period_start_date
   ,  TO_DATE(DATEADD(yy, 1, yd.generated_date),'YYYY-MM-DD HH:MI:SS') as  period_end_date
-from OMOP_TEMP.egctnzanyearly_dates yd
+from OMOP_TEMP.b9ulth36yearly_dates yd
 -- ADD UNION ALLs for additional period definitions
 ) monthlyDates;
 
@@ -2599,35 +2599,35 @@ TRUNCATE TABLE OMOPCDM54_RESULTS.heracles_periods;
 INSERT INTO OMOPCDM54_RESULTS.heracles_periods (period_id, period_name, period_order, period_type, period_start_date, period_end_date)
 select CAST(row_number() over (order by period_order, period_start_date) AS INT) as period_id
 			, period_name, period_order, period_type, period_start_date, period_end_date
-from OMOP_TEMP.egctnzantemp_period;
+from OMOP_TEMP.b9ulth36temp_period;
 
-truncate table OMOP_TEMP.egctnzandigits;
+truncate table OMOP_TEMP.b9ulth36digits;
 
-drop table OMOP_TEMP.egctnzandigits;
+drop table OMOP_TEMP.b9ulth36digits;
 
-truncate table OMOP_TEMP.egctnzangenerate_dates;
+truncate table OMOP_TEMP.b9ulth36generate_dates;
 
-drop table OMOP_TEMP.egctnzangenerate_dates;
+drop table OMOP_TEMP.b9ulth36generate_dates;
 
-truncate table OMOP_TEMP.egctnzanyearly_dates;
+truncate table OMOP_TEMP.b9ulth36yearly_dates;
 
-drop table OMOP_TEMP.egctnzanyearly_dates;
+drop table OMOP_TEMP.b9ulth36yearly_dates;
 
-truncate table OMOP_TEMP.egctnzanquarterly_dates;
+truncate table OMOP_TEMP.b9ulth36quarterly_dates;
 
-drop table OMOP_TEMP.egctnzanquarterly_dates;
+drop table OMOP_TEMP.b9ulth36quarterly_dates;
 
-truncate table OMOP_TEMP.egctnzanmonthly_dates;
+truncate table OMOP_TEMP.b9ulth36monthly_dates;
 
-drop table OMOP_TEMP.egctnzanmonthly_dates;
+drop table OMOP_TEMP.b9ulth36monthly_dates;
 
-truncate table OMOP_TEMP.egctnzanweekly_dates;
+truncate table OMOP_TEMP.b9ulth36weekly_dates;
 
-drop table OMOP_TEMP.egctnzanweekly_dates;
+drop table OMOP_TEMP.b9ulth36weekly_dates;
 
-TRUNCATE TABLE OMOP_TEMP.egctnzantemp_period;
+TRUNCATE TABLE OMOP_TEMP.b9ulth36temp_period;
 
-DROP TABLE OMOP_TEMP.egctnzantemp_period;
+DROP TABLE OMOP_TEMP.b9ulth36temp_period;
 
 CREATE INDEX HRD_IDX_COHORT_DEF_ID ON OMOPCDM54_RESULTS.HERACLES_RESULTS_DIST (cohort_definition_id);
 

@@ -1,5 +1,32 @@
 # ISC Broadsea
 
+## Quick Dev Iteration Instructions
+
+1. Replace ELB Refs in repo.  
+2. Replace User/Pass in repo.  
+3. Add certificate to `iriscert/`  
+4. Run `updown.sh` from the root of this repo.  
+
+## In Hades:
+
+
+```
+source("/home/ohdsi/hades_setup.r")
+connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "SQLAdmin", password = "PASSWORD", connectionString = "jdbc:IRIS://ICCAENDPOINT:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
+conn <- connect(connectionDetails)
+ddl_script <- readChar("omop.ddl", file.info("omop.ddl")$size)
+executeSql(conn, ddl_script)
+```
+Now set achilles the task of querying the OMOP dataset and computing the results in the results schema:
+```
+achilles(connectionDetails = connectionDetails, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output", optimizeAtlasCache = TRUE, createTable = TRUE,  scratchDatabaseSchema = "OMOPCDM54_SCRATCH", numThreads = 5)
+
+createIndices(connectionDetails = connectionDetails, 
+              resultsDatabaseSchema = "OMOPCDM54_RESULTS", 
+              outputFolder = "output2")
+```
+
+
 ## Introduction
 
 Broadsea runs the core OHDSI technology stack using cross-platform Docker container technology. This version includes the customised WebAPI for use with InterSystems IRIS for Health compatibility.
@@ -79,7 +106,7 @@ If connection to InterSystem IRIS data source will be made over TLS, place the p
 
 * To make available IRIS JDBC connector to the Hades solution run the following shell commands to copy InterSystems IRIS jdbc and sql render jar file into the hades container:
 ```
-docker cp ./WebAPI/assets/intersystems-jdbc-3.10.1.jar broadsea-hades:/opt/hades/jdbc_drivers/
+docker cp ./WebAPI/assets/intersystems-jdbc-3.10.3.jar broadsea-hades:/opt/hades/jdbc_drivers/
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/SqlRender/java/SqlRender.jar
 docker cp ./WebAPI/assets/SqlRender-1.16.1-SNAPSHOT.jar broadsea-hades:/usr/local/lib/R/site-library/FeatureExtraction/java/
 ```
@@ -236,7 +263,7 @@ To mount files prepared for Ares (see [Ares GitHub IO](https://ohdsi.github.io/A
 Once logged in to R Studio, the following R commands need to be run in the Console to populate Atlas dashboards. It will be OK to select option 3 (None) when prompted to upgrade packages:
 ```
 source("/home/ohdsi/hades_setup.r")
-connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "SQLAdmin", password = "<PASSWORD>", connectionString = "jdbc:IRIS://k8s-0a6bc2ca-adb040ad-c7bf2ee7c6-e6b05ee242f76bf2.elb.us-east-1.amazonaws.com:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
+connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "SQLAdmin", password = "PASSWORD", connectionString = "jdbc:IRIS://ICCAENDPOINT:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
 conn <- connect(connectionDetails)
 ddl_script <- readChar("omop.ddl", file.info("omop.ddl")$size)
 executeSql(conn, ddl_script)
