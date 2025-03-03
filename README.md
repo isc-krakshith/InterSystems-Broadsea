@@ -1,18 +1,19 @@
 # ISC Broadsea
 
-## Quick Dev Iteration Instructions
+## Quick Dev Iteration Instructions (OMOP Cloud Service)
 
-1. Replace ELB Refs in repo.  
-2. Replace User/Pass in repo.  
-3. Add certificate to `iriscert/`  
-4. Run `updown.sh` from the root of this repo.  
+
+1. Update `updown.sh` with user/pass from OMOP Deployment.
+2. Update `updown.sh` with endpoint from OMOP Deployment.
+3. Update `updown.sh` with certificate contents from OMOP Deployment.
+4. Run `updown.sh` from the root of this repo.
 
 ## In Hades:
 
 
 ```
 source("/home/ohdsi/hades_setup.r")
-connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = "SQLAdmin", password = "PASSWORD", connectionString = "jdbc:IRIS://ICCAENDPOINT:443/USER/:::true", pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
+connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = Sys.getenv("IRIS_USER"), password = Sys.getenv("IRIS_PASS"), connectionString = Sys.getenv("IRIS_JDBC"), pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
 conn <- connect(connectionDetails)
 ddl_script <- readChar("omop.ddl", file.info("omop.ddl")$size)
 executeSql(conn, ddl_script)
