@@ -13,10 +13,7 @@
 
 ```
 source("/home/ohdsi/hades_setup.r")
-connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = Sys.getenv("IRIS_USER"), password = Sys.getenv("IRIS_PASS"), connectionString = Sys.getenv("IRIS_JDBC"), pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
-conn <- connect(connectionDetails)
-ddl_script <- readChar("omop.ddl", file.info("omop.ddl")$size)
-executeSql(conn, ddl_script)
+source("/home/ohdsi/hades_run.r")
 ```
 Now set achilles the task of querying the OMOP dataset and computing the results in the results schema:
 ```
