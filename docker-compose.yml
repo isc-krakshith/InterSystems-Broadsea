@@ -55,6 +55,9 @@ services:
     environment:
       - USER=${HADES_USER}
       - PASSWORD=${HADES_PASSWORD}
+      - IRIS_USER=${IRIS_USER}
+      - IRIS_PASS=${IRIS_PASS}
+      - IRIS_JDBC=${IRIS_JDBC}
     volumes:
       - rstudio-home-data:/home
       - rstudio-tmp-data:/tmp
@@ -80,7 +83,7 @@ services:
     build: 
       context: ./WebAPI
       args:
-        TLS: "false"
+        TLS: "true"
     extends: 
       file: "ohdsi-webapi.yml"
       service: ohdsi-webapi
@@ -106,6 +109,9 @@ services:
     mem_limit: "2G"
     environment:
       - POSTGRES_PASSWORD=mypass
+      - IRIS_USER=${IRIS_USER}
+      - IRIS_PASS=${IRIS_PASS}
+      - IRIS_JDBC=${IRIS_JDBC}
     ports:
       - "5432:5432"
     volumes:

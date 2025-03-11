@@ -1,0 +1,6 @@
+connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = "iris", user = Sys.getenv("IRIS_USER"), password = Sys.getenv("IRIS_PASS"), connectionString = Sys.getenv("IRIS_JDBC"), pathToDriver = Sys.getenv("DATABASECONNECTOR_JAR_FOLDER"), extraSettings="database = USER")
+conn <- connect(connectionDetails)
+conn <- connect(connectionDetails)
+ddl_script <- readChar("omop.ddl", file.info("omop.ddl")$size)
+executeSql(conn, ddl_script)
+achilles(connectionDetails = connectionDetails, cdmDatabaseSchema = "OMOPCDM54", cdmVersion = "5.4",resultsDatabaseSchema = "OMOPCDM54_RESULTS", outputFolder = "output", optimizeAtlasCache = TRUE) 
